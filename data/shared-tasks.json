@@ -1,0 +1,34 @@
+[
+  {
+    "id": "1",
+    "owner": "さく",
+    "title": "仕様レビューの回答整理",
+    "priority": "high",
+    "dueDate": "2026-02-12",
+    "completed": false
+  },
+  {
+    "id": "2",
+    "owner": "さく",
+    "title": "アクティビティログの監視ルール調整",
+    "priority": "medium",
+    "dueDate": "2026-02-14",
+    "completed": true
+  },
+  {
+    "id": "3",
+    "owner": "ぷんつく",
+    "title": "サーバー負荷の週次サマリー作成",
+    "priority": "medium",
+    "dueDate": "2026-02-11",
+    "completed": false
+  },
+  {
+    "id": "4",
+    "owner": "ぷんつく",
+    "title": "監視アラートの再分類",
+    "priority": "low",
+    "dueDate": "2026-02-15",
+    "completed": false
+  }
+]
