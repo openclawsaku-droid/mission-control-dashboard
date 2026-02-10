@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
+import { randomUUID } from "crypto";
 
 type SharedTask = {
   id: string;
@@ -39,6 +40,63 @@ export async function GET() {
   } catch {
     return NextResponse.json(
       { error: "Failed to read shared tasks." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+
+    if (!body || typeof body !== "object") {
+      return NextResponse.json(
+        { error: "Invalid request body." },
+        { status: 400 }
+      );
+    }
+
+    const { owner, title, priority, dueDate } = body as {
+      owner?: string;
+      title?: string;
+      priority?: string;
+      dueDate?: string;
+    };
+
+    if (typeof title !== "string" || title.trim() === "") {
+      return NextResponse.json(
+        { error: "Title is required." },
+        { status: 400 }
+      );
+    }
+
+    if (typeof dueDate !== "string" || dueDate.trim() === "") {
+      return NextResponse.json(
+        { error: "Due date is required." },
+        { status: 400 }
+      );
+    }
+
+    const tasks = await readTasks();
+    const newTask: SharedTask = {
+      id: randomUUID(),
+      owner: typeof owner === "string" && owner.trim() !== "" ? owner.trim() : "さく",
+      title: title.trim(),
+      priority:
+        typeof priority === "string" && priority.trim() !== ""
+          ? priority.trim()
+          : "medium",
+      dueDate: dueDate.trim(),
+      completed: false,
+    };
+
+    const next = [newTask, ...tasks];
+    await writeTasks(next);
+
+    return NextResponse.json(newTask, { status: 201 });
+  } catch {
+    return NextResponse.json(
+      { error: "Failed to create task." },
       { status: 500 }
     );
   }
@@ -90,6 +148,44 @@ export async function PUT(request: Request) {
   } catch {
     return NextResponse.json(
       { error: "Failed to update task." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const body = await request.json();
+
+    if (!body || typeof body !== "object") {
+      return NextResponse.json(
+        { error: "Invalid request body." },
+        { status: 400 }
+      );
+    }
+
+    const { id } = body as { id?: string };
+
+    if (typeof id !== "string" || id.trim() === "") {
+      return NextResponse.json(
+        { error: "Task id is required." },
+        { status: 400 }
+      );
+    }
+
+    const tasks = await readTasks();
+    const next = tasks.filter((task) => task.id !== id);
+
+    if (next.length === tasks.length) {
+      return NextResponse.json({ error: "Task not found." }, { status: 404 });
+    }
+
+    await writeTasks(next);
+
+    return NextResponse.json({ id }, { status: 200 });
+  } catch {
+    return NextResponse.json(
+      { error: "Failed to delete task." },
       { status: 500 }
     );
   }

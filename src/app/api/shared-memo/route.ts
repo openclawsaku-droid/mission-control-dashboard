@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
+import { randomUUID } from "crypto";
 
 type SharedMemo = {
   id: string;
@@ -39,6 +40,59 @@ export async function GET() {
   } catch {
     return NextResponse.json(
       { error: "Failed to read shared memos." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+
+    if (!body || typeof body !== "object") {
+      return NextResponse.json(
+        { error: "Invalid request body." },
+        { status: 400 }
+      );
+    }
+
+    const { direction, message, type } = body as {
+      direction?: string;
+      message?: string;
+      type?: string;
+    };
+
+    if (typeof direction !== "string" || direction.trim() === "") {
+      return NextResponse.json(
+        { error: "Direction is required." },
+        { status: 400 }
+      );
+    }
+
+    if (typeof message !== "string" || message.trim() === "") {
+      return NextResponse.json(
+        { error: "Message is required." },
+        { status: 400 }
+      );
+    }
+
+    const memos = await readMemos();
+    const newMemo: SharedMemo = {
+      id: randomUUID(),
+      direction: direction.trim(),
+      type: typeof type === "string" && type.trim() !== "" ? type.trim() : "メモ",
+      message: message.trim(),
+      createdAt: new Date().toISOString(),
+      read: false,
+    };
+
+    const next = [newMemo, ...memos];
+    await writeMemos(next);
+
+    return NextResponse.json(newMemo, { status: 201 });
+  } catch {
+    return NextResponse.json(
+      { error: "Failed to create memo." },
       { status: 500 }
     );
   }
@@ -90,6 +144,44 @@ export async function PUT(request: Request) {
   } catch {
     return NextResponse.json(
       { error: "Failed to update memo." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const body = await request.json();
+
+    if (!body || typeof body !== "object") {
+      return NextResponse.json(
+        { error: "Invalid request body." },
+        { status: 400 }
+      );
+    }
+
+    const { id } = body as { id?: string };
+
+    if (typeof id !== "string" || id.trim() === "") {
+      return NextResponse.json(
+        { error: "Memo id is required." },
+        { status: 400 }
+      );
+    }
+
+    const memos = await readMemos();
+    const next = memos.filter((memo) => memo.id !== id);
+
+    if (next.length === memos.length) {
+      return NextResponse.json({ error: "Memo not found." }, { status: 404 });
+    }
+
+    await writeMemos(next);
+
+    return NextResponse.json({ id }, { status: 200 });
+  } catch {
+    return NextResponse.json(
+      { error: "Failed to delete memo." },
       { status: 500 }
     );
   }

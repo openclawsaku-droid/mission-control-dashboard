@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 
 type SharedTask = {
   id: string;
@@ -58,6 +65,10 @@ export default function SharedTasks() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const hasLoadedOnce = useRef(false);
+  const [title, setTitle] = useState("");
+  const [dueDate, setDueDate] = useState("");
+  const [priority, setPriority] = useState("medium");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const loadTasks = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -129,6 +140,65 @@ export default function SharedTasks() {
     }
   };
 
+  const handleCreate = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (isSubmitting) return;
+
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle) {
+      setError("タイトルを入力してください。");
+      return;
+    }
+
+    if (!dueDate) {
+      setError("期限を選択してください。");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/shared-tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: trimmedTitle,
+          dueDate,
+          priority,
+        }),
+      });
+      if (!res.ok) {
+        throw new Error(`Request failed with status ${res.status}`);
+      }
+      const created = (await res.json()) as SharedTask;
+      setTasks((prev) => [created, ...prev]);
+      setTitle("");
+      setDueDate("");
+      setPriority("medium");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "共有タスクの作成に失敗しました。");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const deleteTask = async (task: SharedTask) => {
+    setTasks((prev) => prev.filter((item) => item.id !== task.id));
+    try {
+      const res = await fetch("/api/shared-tasks", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: task.id }),
+      });
+      if (!res.ok) {
+        throw new Error(`Request failed with status ${res.status}`);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "削除に失敗しました。");
+      loadTasks(true);
+    }
+  };
+
   return (
     <section className="rounded-3xl border border-slate-200/60 bg-white/80 p-6 shadow-[0_10px_30px_rgba(15,23,42,0.08)] backdrop-blur dark:border-slate-800/70 dark:bg-slate-900/70 dark:shadow-[0_18px_40px_rgba(15,23,42,0.6)]">
       <header className="flex flex-wrap items-start justify-between gap-4">
@@ -144,6 +214,42 @@ export default function SharedTasks() {
           未完了 {remainingCount} 件
         </span>
       </header>
+
+      <form
+        onSubmit={handleCreate}
+        className="mt-6 rounded-2xl border border-slate-200/70 bg-white/90 p-4 shadow-sm dark:border-slate-800/80 dark:bg-slate-950/40"
+      >
+        <div className="flex flex-wrap items-center gap-3">
+          <input
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+            placeholder="タスクのタイトル"
+            className="min-w-[220px] flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-300 focus:outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+          />
+          <input
+            type="date"
+            value={dueDate}
+            onChange={(event) => setDueDate(event.target.value)}
+            className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-300 focus:outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+          />
+          <select
+            value={priority}
+            onChange={(event) => setPriority(event.target.value)}
+            className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-300 focus:outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+          >
+            <option value="high">high</option>
+            <option value="medium">medium</option>
+            <option value="low">low</option>
+          </select>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="rounded-full border border-slate-200/70 px-4 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-white"
+          >
+            {isSubmitting ? "追加中..." : "タスクを追加"}
+          </button>
+        </div>
+      </form>
 
       <div className="mt-6 space-y-4">
         {loading && !hasLoadedOnce.current ? (
@@ -214,7 +320,16 @@ export default function SharedTasks() {
                   </div>
                   <div className="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500">
                     <span>完了チェックで共有更新</span>
-                    <span className={styles.text}>優先度: {task.priority}</span>
+                    <div className="flex items-center gap-2">
+                      <span className={styles.text}>優先度: {task.priority}</span>
+                      <button
+                        type="button"
+                        onClick={() => deleteTask(task)}
+                        className="rounded-full border border-rose-200/70 px-3 py-1 text-xs font-semibold text-rose-600 transition hover:border-rose-300 hover:text-rose-700 dark:border-rose-800 dark:text-rose-300 dark:hover:border-rose-600 dark:hover:text-rose-200"
+                      >
+                        削除
+                      </button>
+                    </div>
                   </div>
                 </article>
               );

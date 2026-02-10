@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 
 type SharedMemo = {
   id: string;
@@ -42,6 +49,9 @@ export default function SharedMemo() {
   const [error, setError] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const hasLoadedOnce = useRef(false);
+  const [sender, setSender] = useState("さく");
+  const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const loadMemos = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -113,6 +123,56 @@ export default function SharedMemo() {
     }
   };
 
+  const handleCreate = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (isSubmitting) return;
+
+    const trimmedMessage = message.trim();
+    if (!trimmedMessage) {
+      setError("メッセージを入力してください。");
+      return;
+    }
+
+    const direction = sender === "さく" ? "さく → ぷんつく" : "ぷんつく → さく";
+
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/shared-memo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ direction, message: trimmedMessage }),
+      });
+      if (!res.ok) {
+        throw new Error(`Request failed with status ${res.status}`);
+      }
+      const created = (await res.json()) as SharedMemo;
+      setMemos((prev) => [created, ...prev]);
+      setMessage("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "共有メモの作成に失敗しました。");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const deleteMemo = async (memo: SharedMemo) => {
+    setMemos((prev) => prev.filter((item) => item.id !== memo.id));
+    try {
+      const res = await fetch("/api/shared-memo", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: memo.id }),
+      });
+      if (!res.ok) {
+        throw new Error(`Request failed with status ${res.status}`);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "削除に失敗しました。");
+      loadMemos(true);
+    }
+  };
+
   return (
     <section className="rounded-3xl border border-slate-200/60 bg-white/80 p-6 shadow-[0_10px_30px_rgba(15,23,42,0.08)] backdrop-blur dark:border-slate-800/70 dark:bg-slate-900/70 dark:shadow-[0_18px_40px_rgba(15,23,42,0.6)]">
       <header className="flex flex-wrap items-start justify-between gap-4">
@@ -133,6 +193,43 @@ export default function SharedMemo() {
           </span>
         </div>
       </header>
+
+      <form
+        onSubmit={handleCreate}
+        className="mt-6 rounded-2xl border border-slate-200/70 bg-white/90 p-4 shadow-sm dark:border-slate-800/80 dark:bg-slate-950/40"
+      >
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+            送信者
+          </label>
+          <select
+            value={sender}
+            onChange={(event) => setSender(event.target.value)}
+            className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm focus:border-slate-300 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+          >
+            <option value="さく">さく</option>
+            <option value="ぷんつく">ぷんつく</option>
+          </select>
+          <span className="text-xs text-slate-400 dark:text-slate-500">
+            {sender === "さく" ? "さく → ぷんつく" : "ぷんつく → さく"}
+          </span>
+        </div>
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <input
+            value={message}
+            onChange={(event) => setMessage(event.target.value)}
+            placeholder="メッセージを入力"
+            className="min-w-[240px] flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-300 focus:outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+          />
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="rounded-full border border-slate-200/70 px-4 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-white"
+          >
+            {isSubmitting ? "送信中..." : "メモを追加"}
+          </button>
+        </div>
+      </form>
 
       <div className="mt-6 space-y-4">
         {loading && !hasLoadedOnce.current ? (
@@ -195,13 +292,22 @@ export default function SharedMemo() {
                     <span className="text-xs text-slate-400 dark:text-slate-500">
                       既読/未読を管理できます
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => toggleRead(memo)}
-                      className="rounded-full border border-slate-200/70 px-3 py-1 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-900 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-500 dark:hover:text-white"
-                    >
-                      {memo.read ? "未読にする" : "既読にする"}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => toggleRead(memo)}
+                        className="rounded-full border border-slate-200/70 px-3 py-1 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-900 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-500 dark:hover:text-white"
+                      >
+                        {memo.read ? "未読にする" : "既読にする"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => deleteMemo(memo)}
+                        className="rounded-full border border-rose-200/70 px-3 py-1 text-xs font-semibold text-rose-600 transition hover:border-rose-300 hover:text-rose-700 dark:border-rose-800 dark:text-rose-300 dark:hover:border-rose-600 dark:hover:text-rose-200"
+                      >
+                        削除
+                      </button>
+                    </div>
                   </div>
                 </article>
               );
