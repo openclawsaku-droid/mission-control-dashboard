@@ -451,19 +451,24 @@ function MyActionsView({
 
                 {parsed && (
                   <div className="mt-4 rounded-xl bg-blue-50 p-4 dark:bg-blue-500/10">
-                    <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                      やり方:
+                    <p className="mb-2 text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-300">
+                      やり方
                     </p>
-                    <p className="mt-1 text-sm leading-relaxed text-blue-800 dark:text-blue-200">
-                      {parsed.instruction}
-                    </p>
+                    <div className="space-y-1">
+                      {parsed.instruction.split("\n").map((line, li) => (
+                        <p key={li} className="text-sm leading-relaxed text-blue-900 dark:text-blue-100">
+                          {line}
+                        </p>
+                      ))}
+                    </div>
                   </div>
                 )}
 
                 {parsed?.after && (
-                  <div className="mt-3 rounded-xl bg-emerald-50 p-4 dark:bg-emerald-500/10">
-                    <p className="text-sm leading-relaxed text-emerald-800 dark:text-emerald-200">
-                      {parsed.after}
+                  <div className="mt-3 flex items-start gap-2 rounded-xl bg-emerald-50 p-4 dark:bg-emerald-500/10">
+                    <span className="mt-0.5 text-sm">✅</span>
+                    <p className="text-sm font-medium leading-relaxed text-emerald-800 dark:text-emerald-200">
+                      ぷんつくがやったら: {parsed.after.replace(/^→\s*/, "")}
                     </p>
                   </div>
                 )}
