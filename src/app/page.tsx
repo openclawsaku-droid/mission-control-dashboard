@@ -20,11 +20,18 @@ type NextAction = {
   task: string;
 };
 
+type ProjectProgress = {
+  done?: string[];
+  inProgress?: string[];
+  blocked?: string[];
+};
+
 type ProjectMeta = {
   description?: string;
   goal?: string;
   status?: string;
   emoji?: string;
+  progress?: ProjectProgress;
   nextActions?: NextAction[];
 };
 
@@ -222,8 +229,23 @@ function ProjectDetail({
   meta?: ProjectMeta;
 }) {
   const emoji = meta?.emoji ? EMOJI_MAP[meta.emoji] || "" : "";
+  const p = meta?.progress;
+  const doneCount = p?.done?.length || 0;
+  const ipCount = p?.inProgress?.length || 0;
+  const blockedCount = p?.blocked?.length || 0;
+  const totalTasks = doneCount + ipCount + blockedCount;
+  const progressPct = totalTasks > 0 ? Math.round((doneCount / totalTasks) * 100) : 0;
+
+  // Sort outputs: action items first, then review, then draft, then final
+  const statusOrder: Record<string, number> = { review: 0, draft: 1, final: 2 };
+  const sortedItems = [...items].sort((a, b) => {
+    if (a.action && !b.action) return -1;
+    if (!a.action && b.action) return 1;
+    return (statusOrder[a.status || "final"] ?? 2) - (statusOrder[b.status || "final"] ?? 2);
+  });
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Project Header */}
       <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
         <div className="flex items-start justify-between gap-3">
@@ -238,45 +260,121 @@ function ProjectDetail({
           )}
         </div>
         {meta?.description && (
-          <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+          <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
             {meta.description}
           </p>
         )}
         {meta?.goal && (
-          <div className="mt-3 flex items-start gap-2 text-sm">
-            <span className="shrink-0 font-medium text-slate-500 dark:text-slate-400">Goal:</span>
-            <span className="text-slate-700 dark:text-slate-300">{meta.goal}</span>
+          <p className="mt-2 text-sm text-slate-700 dark:text-slate-300">
+            <span className="font-medium text-slate-500 dark:text-slate-400">Goal: </span>
+            {meta.goal}
+          </p>
+        )}
+        {/* Progress Bar */}
+        {totalTasks > 0 && (
+          <div className="mt-4">
+            <div className="mb-1.5 flex items-center justify-between text-xs">
+              <span className="text-slate-500 dark:text-slate-400">進捗</span>
+              <span className="font-medium text-slate-700 dark:text-slate-300">{progressPct}%（{doneCount}/{totalTasks}）</span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+              <div
+                className="h-full rounded-full bg-emerald-500 transition-all duration-500"
+                style={{ width: `${progressPct}%` }}
+              />
+            </div>
           </div>
         )}
-        <p className="mt-3 text-xs text-slate-400 dark:text-slate-500">{items.length} outputs</p>
       </div>
 
-      {/* Next Actions */}
-      {meta?.nextActions && meta.nextActions.length > 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-          <h3 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Next Actions</h3>
-          <div className="space-y-2">
-            {meta.nextActions.map((action, i) => (
-              <div key={i} className="flex items-start gap-3 rounded-lg bg-slate-50 px-3 py-2.5 dark:bg-slate-800/50">
-                <span className={`mt-0.5 shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
-                  action.owner === "ぷんつく"
-                    ? "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300"
-                    : "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300"
-                }`}>
-                  {action.owner}
-                </span>
-                <span className="text-sm text-slate-700 dark:text-slate-300">{action.task}</span>
-              </div>
-            ))}
-          </div>
+      {/* Status Grid: Blocked + In Progress + Next Actions in columns */}
+      <div className="grid gap-4 lg:grid-cols-3">
+        {/* Blocked */}
+        <div className="rounded-xl border border-rose-200 bg-rose-50/50 p-4 dark:border-rose-500/20 dark:bg-rose-500/5">
+          <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-rose-700 dark:text-rose-300">
+            <span className="h-2 w-2 rounded-full bg-rose-500" />
+            ブロック中
+          </h3>
+          {blockedCount > 0 ? (
+            <ul className="space-y-2">
+              {p?.blocked?.map((item, i) => (
+                <li key={i} className="text-sm text-rose-700 dark:text-rose-300">{item}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-rose-400 dark:text-rose-500">なし</p>
+          )}
         </div>
+
+        {/* In Progress */}
+        <div className="rounded-xl border border-blue-200 bg-blue-50/50 p-4 dark:border-blue-500/20 dark:bg-blue-500/5">
+          <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-blue-700 dark:text-blue-300">
+            <span className="h-2 w-2 rounded-full bg-blue-500" />
+            進行中
+          </h3>
+          {ipCount > 0 ? (
+            <ul className="space-y-2">
+              {p?.inProgress?.map((item, i) => (
+                <li key={i} className="text-sm text-blue-700 dark:text-blue-300">{item}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-blue-400 dark:text-blue-500">なし</p>
+          )}
+        </div>
+
+        {/* Next Actions */}
+        <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-4 dark:border-amber-500/20 dark:bg-amber-500/5">
+          <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-amber-700 dark:text-amber-300">
+            <span className="h-2 w-2 rounded-full bg-amber-500" />
+            Next Actions
+          </h3>
+          {meta?.nextActions && meta.nextActions.length > 0 ? (
+            <ul className="space-y-2">
+              {meta.nextActions.map((action, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm">
+                  <span className={`mt-0.5 shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold ${
+                    action.owner === "ぷんつく"
+                      ? "bg-amber-200 text-amber-800 dark:bg-amber-500/20 dark:text-amber-200"
+                      : "bg-blue-200 text-blue-800 dark:bg-blue-500/20 dark:text-blue-200"
+                  }`}>
+                    {action.owner}
+                  </span>
+                  <span className="text-amber-800 dark:text-amber-200">{action.task}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-amber-400 dark:text-amber-500">なし</p>
+          )}
+        </div>
+      </div>
+
+      {/* Done Items (collapsible summary) */}
+      {doneCount > 0 && (
+        <details className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-4 dark:border-emerald-500/20 dark:bg-emerald-500/5">
+          <summary className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" />
+            完了済み（{doneCount}件）
+          </summary>
+          <ul className="mt-3 space-y-1.5">
+            {p?.done?.map((item, i) => (
+              <li key={i} className="text-sm text-emerald-700 dark:text-emerald-300">✓ {item}</li>
+            ))}
+          </ul>
+        </details>
       )}
 
       {/* Output Cards */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        {items.map((item) => (
-          <OutputCard key={item.id} item={item} />
-        ))}
+      <div>
+        <h3 className="mb-4 text-sm font-semibold text-slate-700 dark:text-slate-300">
+          アウトプット（{items.length}件）
+        </h3>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {sortedItems.map((item) => (
+            <OutputCard key={item.id} item={item} />
+          ))}
+        </div>
       </div>
     </div>
   );

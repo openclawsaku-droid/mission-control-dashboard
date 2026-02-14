@@ -4,6 +4,11 @@
     "goal": "安藤さんのところで実績作り → 20社で損益分岐",
     "status": "準備中",
     "emoji": "rocket",
+    "progress": {
+      "done": ["価格設計確定（導入30万、ライト月10万、プレミアム月40万）", "セキュリティガイドライン完成", "コード監査完了", "実現性分析完了", "スケール戦略策定（RMMモデル、Langfuse監視）"],
+      "inProgress": ["Mac mini到着待ち（3/2〜3/9届き予定）"],
+      "blocked": ["安藤さんへのパイロット提案（ぷんつく判断待ち）"]
+    },
     "nextActions": [
       { "owner": "ぷんつく", "task": "価格設定（30万）にFBする" },
       { "owner": "ぷんつく", "task": "安藤さんにパイロット提案する" },
@@ -15,6 +20,11 @@
     "goal": "フィードバックをもらってビジネスモデルを磨く",
     "status": "準備完了",
     "emoji": "target",
+    "progress": {
+      "done": ["深津さん調査完了", "壁打ちアジェンダ作成", "1枚サマリー作成", "さくaaS v2提案書完成", "GPT-5.2+OpenAIミッション変遷ネタ準備"],
+      "inProgress": [],
+      "blocked": ["アジェンダ最終確認（ぷんつく）"]
+    },
     "nextActions": [
       { "owner": "ぷんつく", "task": "壁打ちアジェンダを最終確認する" },
       { "owner": "ぷんつく", "task": "2/17当日、深津さんと壁打ち" },
@@ -26,6 +36,11 @@
     "goal": "安藤さん・白川さんに提案 → パイロット開始",
     "status": "設計済み",
     "emoji": "seedling",
+    "progress": {
+      "done": ["AIC設計v3完成（白川さんFB反映済み）", "育成プログラムOverview作成", "未踏ジュニア調査完了", "法的整理完了"],
+      "inProgress": [],
+      "blocked": ["提案タイミング決め（ぷんつく判断待ち）"]
+    },
     "nextActions": [
       { "owner": "ぷんつく", "task": "AIC設計v3（白川さんFB反映版）を確認する" },
       { "owner": "ぷんつく", "task": "安藤さん・白川さんに提案するタイミングを決める" }
@@ -36,6 +51,11 @@
     "goal": "フォロワー拡大 → サービス検証の土台に",
     "status": "運用中",
     "emoji": "zap",
+    "progress": {
+      "done": ["アカウント開設+運用開始", "X承認フロー構築", "競合分析完了", "投稿分析完了（引用RT=6.9倍）", "投稿はさく視点で統一"],
+      "inProgress": ["毎日のTL巡回+いいね+投稿案作成"],
+      "blocked": ["承認キュー51件溜まり中（ぷんつく承認待ち）"]
+    },
     "nextActions": [
       { "owner": "ぷんつく", "task": "承認キュー51件を確認・承認する" },
       { "owner": "さく", "task": "引き続きAI系TL巡回+いいね+投稿案作成" }
@@ -46,6 +66,11 @@
     "goal": "日本版Lindy AI路線でGo/NoGo判断",
     "status": "調査完了",
     "emoji": "chart",
+    "progress": {
+      "done": ["1222社スタートアップ調査", "Lindy AI深掘り", "日本競合マップ", "ブルーオーシャン分析", "ビジネスプラン5案", "チームマネジメントレポート"],
+      "inProgress": [],
+      "blocked": ["方向性の最終決定（深津壁打ち後）"]
+    },
     "nextActions": [
       { "owner": "ぷんつく", "task": "深津壁打ち後に方向性を最終決定する" },
       { "owner": "さく", "task": "壁打ちFB反映後にビジネスプランを更新する" }
@@ -56,6 +81,11 @@
     "goal": "講座資料を整備して受講者に提供",
     "status": "運用中",
     "emoji": "book",
+    "progress": {
+      "done": ["Cursor講座スライド完成", "Claude Code導入ガイド完成", "AITech MTGガイドv2完成"],
+      "inProgress": ["次回講座テーマ調整中"],
+      "blocked": []
+    },
     "nextActions": [
       { "owner": "さく", "task": "次回講座テーマを藤井さんと調整する" }
     ]
@@ -65,6 +95,11 @@
     "goal": "安全で効率的な開発環境を維持",
     "status": "運用中",
     "emoji": "gear",
+    "progress": {
+      "done": ["セキュリティ硬化（exec-approvals、Funnel停止）", "OpenClaw脅威分析", "セキュリティ統合レポート", "Mission Controlダッシュボード構築", "成果物ビュー+プロジェクトUI"],
+      "inProgress": ["ブラウザ停止時の通知検知漏れ対策", "ダッシュボード改善"],
+      "blocked": []
+    },
     "nextActions": [
       { "owner": "さく", "task": "ブラウザ停止時の通知検知漏れ対策を実装する" },
       { "owner": "さく", "task": "Mission Controlダッシュボードの改善を継続する" }
@@ -75,6 +110,11 @@
     "goal": "MTGの自動記録 → さくaaSの付加価値に",
     "status": "Phase 1完了",
     "emoji": "mic",
+    "progress": {
+      "done": ["Phase 1完了（自動参加+録音）", "設計書v2完成"],
+      "inProgress": [],
+      "blocked": ["Phase 2設計待ち（優先度低め、壁打ち後に判断）"]
+    },
     "nextActions": [
       { "owner": "さく", "task": "Phase 2（議事録自動要約+共有）の設計を進める" }
     ]
@@ -84,6 +124,11 @@
     "goal": "Mindcraft実装 → プロトタイプでテスト → 藤井さんと進める",
     "status": "設計・分析済み",
     "emoji": "pickaxe",
+    "progress": {
+      "done": ["Miroボード分析（564アイテム）", "mine.de.school設計資料ドキュメント化", "Mindcraftソースコード深掘り分析", "コンテキスト管理v2設計"],
+      "inProgress": [],
+      "blocked": ["Mindcraft実装着手（藤井さんとの方針共有待ち）"]
+    },
     "nextActions": [
       { "owner": "さく", "task": "Mindcraftフォークしてmemory_bank.js拡張に着手する" },
       { "owner": "ぷんつく", "task": "藤井さんと次回MTGで実装方針を共有する" }
