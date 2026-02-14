@@ -407,49 +407,83 @@ function MyActionsView({
   const allActions = Object.entries(projectMeta).flatMap(([project, meta]) =>
     (meta.nextActions || [])
       .filter((a) => a.owner === "ぷんつく")
-      .map((a) => ({ ...a, project, emoji: meta.emoji ? EMOJI_MAP[meta.emoji] || "" : "", how: a.how, link: a.link }))
+      .map((a) => ({ ...a, project, emoji: meta.emoji ? EMOJI_MAP[meta.emoji] || "" : "" }))
   );
 
+  // Split how text into main instruction and "→ さく..." part
+  function splitHow(how?: string): { instruction: string; after: string } | null {
+    if (!how) return null;
+    const idx = how.indexOf("→");
+    if (idx === -1) return { instruction: how, after: "" };
+    return { instruction: how.slice(0, idx).trim(), after: how.slice(idx).trim() };
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">ぷんつくのアクション一覧</h2>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          全プロジェクトから集約（{allActions.length}件）
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">やることリスト</h2>
+        <p className="mt-2 text-base text-slate-500 dark:text-slate-400">
+          {allActions.length}件 — 上から順番にやるだけ
         </p>
       </div>
-      <div className="space-y-3">
-        {allActions.map((action, i) => (
-          <div
-            key={i}
-            className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
-          >
-            <div className="flex items-start gap-4">
-              <span className="mt-0.5 shrink-0 text-lg">{action.emoji}</span>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{action.task}</p>
-                <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">{action.project}</p>
+      <div className="space-y-4">
+        {allActions.map((action, i) => {
+          const parsed = splitHow(action.how);
+          return (
+            <div
+              key={i}
+              className="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900"
+            >
+              {/* Header */}
+              <div className="flex items-center gap-3 border-b border-slate-100 bg-slate-50 px-5 py-3 dark:border-slate-800 dark:bg-slate-800/50">
+                <span className="text-xl">{action.emoji}</span>
+                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{action.project}</span>
+                <span className="ml-auto flex h-6 w-6 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+                  {i + 1}
+                </span>
+              </div>
+
+              {/* Body */}
+              <div className="p-5">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                  {action.task}
+                </h3>
+
+                {parsed && (
+                  <div className="mt-4 rounded-xl bg-blue-50 p-4 dark:bg-blue-500/10">
+                    <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                      やり方:
+                    </p>
+                    <p className="mt-1 text-sm leading-relaxed text-blue-800 dark:text-blue-200">
+                      {parsed.instruction}
+                    </p>
+                  </div>
+                )}
+
+                {parsed?.after && (
+                  <div className="mt-3 rounded-xl bg-emerald-50 p-4 dark:bg-emerald-500/10">
+                    <p className="text-sm leading-relaxed text-emerald-800 dark:text-emerald-200">
+                      {parsed.after}
+                    </p>
+                  </div>
+                )}
+
+                {action.link && (
+                  <a
+                    href={action.link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition-all hover:bg-blue-700 active:scale-95"
+                  >
+                    開く →
+                  </a>
+                )}
               </div>
             </div>
-            {action.how && (
-              <p className="mt-2 ml-10 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-                {action.how}
-              </p>
-            )}
-            {action.link && (
-              <a
-                href={action.link}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-1.5 ml-10 inline-block rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition-all hover:bg-blue-100 dark:bg-blue-500/10 dark:text-blue-300 dark:hover:bg-blue-500/20"
-              >
-                開く →
-              </a>
-            )}
-          </div>
-        ))}
+          );
+        })}
         {allActions.length === 0 && (
-          <p className="text-sm text-slate-400">アクションなし、全部さくがやるよ 笑</p>
+          <p className="text-base text-slate-400">アクションなし、全部さくがやるよ 笑</p>
         )}
       </div>
     </div>
