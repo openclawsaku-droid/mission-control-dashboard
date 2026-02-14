@@ -2,165 +2,621 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import ActivityFeed from "./components/ActivityFeed";
-import GlobalSearch from "./components/GlobalSearch";
-import SharedMemo from "./components/SharedMemo";
-import SharedTasks from "./components/SharedTasks";
-import WeeklyCalendar from "./components/WeeklyCalendar";
+type OutputItem = {
+  id: string;
+  title: string;
+  type: string;
+  url: string;
+  summary?: string;
+  tags?: string[];
+  project?: string;
+  status?: "draft" | "review" | "final";
+  action?: "review" | "approve" | "feedback" | "read";
+  createdAt: string;
+};
+
+type NextAction = {
+  owner: string;
+  task: string;
+};
+
+type ProjectMeta = {
+  description?: string;
+  goal?: string;
+  status?: string;
+  emoji?: string;
+  nextActions?: NextAction[];
+};
+
+type ViewState =
+  | { kind: "overview" }
+  | { kind: "action-required" }
+  | { kind: "my-actions" }
+  | { kind: "saku-report" }
+  | { kind: "project"; name: string };
 
 const THEME_KEY = "mission-control-theme";
 
-const SECTIONS = [
-  { id: "dashboard", label: "Dashboard", subtitle: "Overview" },
-  { id: "calendar", label: "Calendar", subtitle: "Weekly plan" },
-  { id: "activity", label: "Activity", subtitle: "Live feed" },
-  { id: "shared", label: "Shared", subtitle: "Team space" },
-];
+const ACTION_BADGE: Record<string, { label: string; bg: string; text: string; dot: string }> = {
+  review: { label: "レビュー依頼", bg: "bg-rose-50 dark:bg-rose-500/10", text: "text-rose-700 dark:text-rose-300", dot: "bg-rose-500" },
+  approve: { label: "承認待ち", bg: "bg-orange-50 dark:bg-orange-500/10", text: "text-orange-700 dark:text-orange-300", dot: "bg-orange-500" },
+  feedback: { label: "FB募集", bg: "bg-violet-50 dark:bg-violet-500/10", text: "text-violet-700 dark:text-violet-300", dot: "bg-violet-500" },
+  read: { label: "要確認", bg: "bg-blue-50 dark:bg-blue-500/10", text: "text-blue-700 dark:text-blue-300", dot: "bg-blue-500" },
+};
+
+const STATUS_LABEL: Record<string, string> = { draft: "Draft", review: "Review", final: "Final" };
+
+const EMOJI_MAP: Record<string, string> = {
+  rocket: "\u{1F680}",
+  target: "\u{1F3AF}",
+  seedling: "\u{1F331}",
+  zap: "\u{26A1}",
+  chart: "\u{1F4CA}",
+  book: "\u{1F4DA}",
+  gear: "\u{2699}\uFE0F",
+  mic: "\u{1F3A4}",
+  pickaxe: "\u{26CF}\uFE0F",
+};
+
+function formatDate(v: string) {
+  const d = new Date(v);
+  if (Number.isNaN(d.getTime())) return "";
+  return new Intl.DateTimeFormat("ja-JP", { month: "short", day: "numeric" }).format(d);
+}
+
+function OutputCard({ item }: { item: OutputItem }) {
+  const isMemory = item.type === "memory";
+  const action = item.action && ACTION_BADGE[item.action] ? ACTION_BADGE[item.action] : null;
+  const status = item.status || "final";
+
+  const inner = (
+    <div className="flex h-full flex-col">
+      {action && (
+        <div className={`mb-3 flex items-center gap-2 rounded-lg px-3 py-2 ${action.bg}`}>
+          <span className={`h-2 w-2 shrink-0 rounded-full ${action.dot}`} />
+          <span className={`text-xs font-semibold ${action.text}`}>{action.label}</span>
+        </div>
+      )}
+      <h4 className="text-[15px] font-semibold leading-snug text-slate-900 dark:text-slate-100">
+        {item.title}
+      </h4>
+      {item.summary && (
+        <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+          {item.summary}
+        </p>
+      )}
+      <div className="mt-auto flex items-center gap-2 pt-4 text-xs text-slate-400 dark:text-slate-500">
+        <span className="rounded bg-slate-100 px-1.5 py-0.5 font-medium text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+          {STATUS_LABEL[status] || status}
+        </span>
+        {isMemory && (
+          <span className="rounded bg-indigo-50 px-1.5 py-0.5 font-medium text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400">
+            Local
+          </span>
+        )}
+        <span className="ml-auto">{formatDate(item.createdAt)}</span>
+      </div>
+    </div>
+  );
+
+  const cls =
+    "group flex flex-col rounded-xl border border-slate-200 bg-white p-5 transition-all duration-150 hover:border-slate-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700";
+
+  if (isMemory) {
+    return <article className={cls}>{inner}</article>;
+  }
+  return (
+    <a href={item.url} target="_blank" rel="noreferrer" className={cls}>
+      {inner}
+    </a>
+  );
+}
+
+function ProjectOverview({
+  projects,
+  actionItems,
+  projectMeta,
+  onSelect,
+}: {
+  projects: { name: string; items: OutputItem[]; actionCount: number }[];
+  actionItems: OutputItem[];
+  projectMeta: Record<string, ProjectMeta>;
+  onSelect: (v: ViewState) => void;
+}) {
+  return (
+    <div className="space-y-10">
+      {/* Action Required Banner */}
+      {actionItems.length > 0 && (
+        <button
+          type="button"
+          onClick={() => onSelect({ kind: "action-required" })}
+          className="flex w-full items-center gap-4 rounded-xl border border-rose-200 bg-rose-50 p-5 text-left transition-all hover:shadow-md dark:border-rose-500/20 dark:bg-rose-500/5"
+        >
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-rose-100 dark:bg-rose-500/20">
+            <span className="text-lg font-bold text-rose-600 dark:text-rose-300">{actionItems.length}</span>
+          </div>
+          <div>
+            <p className="text-base font-semibold text-rose-800 dark:text-rose-200">要対応</p>
+            <p className="mt-0.5 text-sm text-rose-600 dark:text-rose-400">
+              レビュー・承認・確認が必要なアイテムがあります
+            </p>
+          </div>
+          <span className="ml-auto text-rose-400">→</span>
+        </button>
+      )}
+
+      {/* Project Grid */}
+      <div>
+        <h2 className="mb-6 text-xl font-semibold text-slate-900 dark:text-slate-100">Projects</h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {projects.map((p) => {
+            const meta = projectMeta[p.name];
+            const emoji = meta?.emoji ? EMOJI_MAP[meta.emoji] || "" : "";
+            return (
+              <button
+                key={p.name}
+                type="button"
+                onClick={() => onSelect({ kind: "project", name: p.name })}
+                className="flex flex-col rounded-xl border border-slate-200 bg-white p-5 text-left transition-all hover:border-slate-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                    {emoji && <span className="mr-1.5">{emoji}</span>}
+                    {p.name}
+                  </h3>
+                  {meta?.status && (
+                    <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                      {meta.status}
+                    </span>
+                  )}
+                </div>
+                {meta?.description && (
+                  <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                    {meta.description}
+                  </p>
+                )}
+                {meta?.nextActions && meta.nextActions.length > 0 && (
+                  <div className="mt-3 space-y-1">
+                    {meta.nextActions.slice(0, 2).map((action, i) => (
+                      <div key={i} className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+                        <span className={`shrink-0 rounded px-1 py-0.5 text-[10px] font-semibold ${
+                          action.owner === "ぷんつく"
+                            ? "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400"
+                            : "bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400"
+                        }`}>
+                          {action.owner}
+                        </span>
+                        <span className="truncate">{action.task}</span>
+                      </div>
+                    ))}
+                    {meta.nextActions.length > 2 && (
+                      <p className="text-[11px] text-slate-400 dark:text-slate-500">+{meta.nextActions.length - 2} more</p>
+                    )}
+                  </div>
+                )}
+                <div className="mt-auto flex items-center gap-3 pt-3 text-xs text-slate-400 dark:text-slate-500">
+                  <span>{p.items.length} outputs</span>
+                  {p.actionCount > 0 && (
+                    <span className="flex items-center gap-1 text-rose-600 dark:text-rose-400">
+                      <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
+                      {p.actionCount} 要対応
+                    </span>
+                  )}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProjectDetail({
+  name,
+  items,
+  meta,
+}: {
+  name: string;
+  items: OutputItem[];
+  meta?: ProjectMeta;
+}) {
+  const emoji = meta?.emoji ? EMOJI_MAP[meta.emoji] || "" : "";
+  return (
+    <div className="space-y-8">
+      {/* Project Header */}
+      <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+        <div className="flex items-start justify-between gap-3">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+            {emoji && <span className="mr-2">{emoji}</span>}
+            {name}
+          </h2>
+          {meta?.status && (
+            <span className="shrink-0 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-500/15 dark:text-blue-300">
+              {meta.status}
+            </span>
+          )}
+        </div>
+        {meta?.description && (
+          <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+            {meta.description}
+          </p>
+        )}
+        {meta?.goal && (
+          <div className="mt-3 flex items-start gap-2 text-sm">
+            <span className="shrink-0 font-medium text-slate-500 dark:text-slate-400">Goal:</span>
+            <span className="text-slate-700 dark:text-slate-300">{meta.goal}</span>
+          </div>
+        )}
+        <p className="mt-3 text-xs text-slate-400 dark:text-slate-500">{items.length} outputs</p>
+      </div>
+
+      {/* Next Actions */}
+      {meta?.nextActions && meta.nextActions.length > 0 && (
+        <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+          <h3 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Next Actions</h3>
+          <div className="space-y-2">
+            {meta.nextActions.map((action, i) => (
+              <div key={i} className="flex items-start gap-3 rounded-lg bg-slate-50 px-3 py-2.5 dark:bg-slate-800/50">
+                <span className={`mt-0.5 shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                  action.owner === "ぷんつく"
+                    ? "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300"
+                    : "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300"
+                }`}>
+                  {action.owner}
+                </span>
+                <span className="text-sm text-slate-700 dark:text-slate-300">{action.task}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Output Cards */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        {items.map((item) => (
+          <OutputCard key={item.id} item={item} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MyActionsView({
+  projectMeta,
+}: {
+  projectMeta: Record<string, ProjectMeta>;
+}) {
+  const allActions = Object.entries(projectMeta).flatMap(([project, meta]) =>
+    (meta.nextActions || [])
+      .filter((a) => a.owner === "ぷんつく")
+      .map((a) => ({ ...a, project, emoji: meta.emoji ? EMOJI_MAP[meta.emoji] || "" : "" }))
+  );
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">ぷんつくのアクション一覧</h2>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          全プロジェクトから集約（{allActions.length}件）
+        </p>
+      </div>
+      <div className="space-y-3">
+        {allActions.map((action, i) => (
+          <div
+            key={i}
+            className="flex items-start gap-4 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
+          >
+            <span className="mt-0.5 shrink-0 text-lg">{action.emoji}</span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{action.task}</p>
+              <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">{action.project}</p>
+            </div>
+          </div>
+        ))}
+        {allActions.length === 0 && (
+          <p className="text-sm text-slate-400">アクションなし、全部さくがやるよ 笑</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+type ReportEntry = {
+  date: string;
+  entries: { time: string; content: string; project?: string }[];
+};
+
+function SakuReportView() {
+  const [reports, setReports] = useState<ReportEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/reports", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => setReports(Array.isArray(data) ? data : []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">さくの活動レポート</h2>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            日別の活動ログ（GitHub管理）
+          </p>
+        </div>
+        <a
+          href="https://github.com/SakuSakuAICompany/mission-control-reports"
+          target="_blank"
+          rel="noreferrer"
+          className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition-all hover:border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+        >
+          GitHub →
+        </a>
+      </div>
+      {loading ? (
+        <p className="text-sm text-slate-400">Loading...</p>
+      ) : reports.length === 0 ? (
+        <p className="text-sm text-slate-400">レポートはまだありません</p>
+      ) : (
+        <div className="space-y-6">
+          {reports.map((report) => (
+            <div key={report.date} className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+              <h3 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">{report.date}</h3>
+              <div className="space-y-2">
+                {report.entries.map((entry, i) => (
+                  <div key={i} className="flex items-start gap-3 text-sm">
+                    <span className="shrink-0 font-mono text-xs text-slate-400 dark:text-slate-500">{entry.time}</span>
+                    <div className="min-w-0">
+                      <p className="text-slate-700 dark:text-slate-300">{entry.content}</p>
+                      {entry.project && (
+                        <span className="mt-0.5 inline-block rounded bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                          {entry.project}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ActionRequiredView({ items }: { items: OutputItem[] }) {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">要対応</h2>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          レビュー・承認・確認が必要なアイテム（{items.length}件）
+        </p>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {items.map((item) => (
+          <OutputCard key={item.id} item={item} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
+  const [outputs, setOutputs] = useState<OutputItem[]>([]);
+  const [projectMeta, setProjectMeta] = useState<Record<string, ProjectMeta>>({});
+  const [loading, setLoading] = useState(true);
+  const [view, setView] = useState<ViewState>({ kind: "overview" });
   const [isDark, setIsDark] = useState(false);
-  const [hasInitialized, setHasInitialized] = useState(false);
-  const [activeSection, setActiveSection] = useState("dashboard");
-
-  const sectionIds = useMemo(() => SECTIONS.map((section) => section.id), []);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(THEME_KEY);
-    const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
-    const initial = stored ? stored === "dark" : Boolean(prefersDark);
-    setIsDark(initial);
-    setHasInitialized(true);
+    if (stored === "dark") {
+      const frame = window.requestAnimationFrame(() => setIsDark(true));
+      return () => window.cancelAnimationFrame(frame);
+    }
   }, []);
 
   useEffect(() => {
-    if (!hasInitialized) return;
-    const root = document.documentElement;
-    root.classList.toggle("dark", isDark);
+    document.documentElement.classList.toggle("dark", isDark);
     window.localStorage.setItem(THEME_KEY, isDark ? "dark" : "light");
-  }, [hasInitialized, isDark]);
+  }, [isDark]);
 
   useEffect(() => {
-    const sectionElements = sectionIds
-      .map((id) => document.getElementById(id))
-      .filter((section): section is HTMLElement => Boolean(section));
+    Promise.all([
+      fetch("/api/outputs", { cache: "no-store" }).then((r) => r.json()),
+      fetch("/api/projects", { cache: "no-store" }).then((r) => r.json()).catch(() => ({})),
+    ])
+      .then(([outputsData, projectsData]) => {
+        setOutputs(Array.isArray(outputsData) ? outputsData : []);
+        setProjectMeta(projectsData || {});
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
-    if (!sectionElements.length) return;
+  const actionItems = useMemo(
+    () => outputs.filter((o) => o.action && ACTION_BADGE[o.action]),
+    [outputs]
+  );
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
-          .forEach((entry) => {
-            if (entry.target instanceof HTMLElement) {
-              setActiveSection(entry.target.id);
-            }
-          });
-      },
-      {
-        rootMargin: "-30% 0px -55% 0px",
-        threshold: [0, 0.2, 0.6, 1],
-      }
-    );
+  const projects = useMemo(() => {
+    const map = new Map<string, OutputItem[]>();
+    for (const o of outputs) {
+      const name = o.project?.trim() || "Other";
+      const list = map.get(name);
+      if (list) list.push(o);
+      else map.set(name, [o]);
+    }
+    return Array.from(map.entries())
+      .map(([name, items]) => ({
+        name,
+        items,
+        actionCount: items.filter((i) => i.action && ACTION_BADGE[i.action]).length,
+      }))
+      .sort((a, b) => {
+        // Action items first, then by count
+        if (a.actionCount !== b.actionCount) return b.actionCount - a.actionCount;
+        return b.items.length - a.items.length;
+      });
+  }, [outputs]);
 
-    sectionElements.forEach((section) => observer.observe(section));
-
-    return () => observer.disconnect();
-  }, [sectionIds]);
+  const breadcrumb =
+    view.kind === "project"
+      ? view.name
+      : view.kind === "action-required"
+        ? "要対応"
+        : view.kind === "my-actions"
+          ? "My Actions"
+          : view.kind === "saku-report"
+            ? "さくレポート"
+            : null;
 
   return (
-    <div className="min-h-screen scroll-smooth bg-gradient-to-br from-slate-50 via-slate-100 to-sky-100 text-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 dark:text-slate-100">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 py-6 lg:flex-row lg:items-start lg:gap-10 lg:px-10 lg:py-10">
-        <nav className="rounded-3xl border border-slate-200/80 bg-white/70 p-4 shadow-sm backdrop-blur lg:sticky lg:top-10 lg:w-56 dark:border-slate-800/80 dark:bg-slate-900/70">
-          <div className="flex items-center justify-between lg:flex-col lg:items-start lg:gap-6">
-            <div className="hidden lg:block">
-              <p className="text-[0.6rem] font-semibold uppercase tracking-[0.35em] text-slate-400 dark:text-slate-500">
-                Navigate
-              </p>
-              <h2 className="mt-2 text-xl font-semibold text-slate-900 dark:text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+      <div className="flex min-h-screen flex-col md:flex-row">
+        {/* Sidebar */}
+        <aside className="w-full shrink-0 border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950 md:w-[220px] md:border-b-0 md:border-r">
+          <div className="p-5">
+            <button
+              type="button"
+              onClick={() => setView({ kind: "overview" })}
+              className="text-left"
+            >
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
                 Mission Control
-              </h2>
-            </div>
-            <div className="flex w-full flex-1 items-center gap-2 overflow-x-auto lg:flex-col lg:items-stretch lg:gap-1 lg:overflow-visible">
-              {SECTIONS.map((section) => {
-                const isActive = activeSection === section.id;
-                return (
-                  <a
-                    key={section.id}
-                    href={`#${section.id}`}
-                    onClick={() => setActiveSection(section.id)}
-                    className={`group flex min-w-[140px] flex-1 items-center justify-between gap-3 rounded-2xl border px-3 py-2 text-left text-sm font-semibold transition lg:min-w-0 lg:flex-none lg:px-4 lg:py-3 ${
-                      isActive
-                        ? "border-slate-900/60 bg-slate-900 text-white shadow-sm dark:border-slate-100/70 dark:bg-white dark:text-slate-900"
-                        : "border-transparent text-slate-600 hover:border-slate-300 hover:bg-white/80 dark:text-slate-400 dark:hover:border-slate-700 dark:hover:bg-slate-900/60"
-                    }`}
-                    aria-current={isActive ? "page" : undefined}
-                  >
-                    <span>{section.label}</span>
-                    <span
-                      className={`text-[0.6rem] uppercase tracking-[0.3em] ${
-                        isActive
-                          ? "text-white/80 dark:text-slate-700"
-                          : "text-slate-400 group-hover:text-slate-500 dark:text-slate-600"
-                      }`}
-                    >
-                      {section.subtitle}
-                    </span>
-                  </a>
-                );
-              })}
-            </div>
+              </p>
+              <h1 className="mt-1 text-lg font-semibold text-slate-900 dark:text-slate-100">
+                Projects
+              </h1>
+            </button>
           </div>
-        </nav>
 
-        <main className="flex min-w-0 flex-1 flex-col gap-8">
-          <section id="dashboard" className="scroll-mt-24">
-            <header className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.35em] text-slate-400 dark:text-slate-500">
-                  Mission Control
-                </p>
-                <h1 className="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">
-                  Mission Control
-                </h1>
-                <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-                  Unified visibility into tasks, activity, and system intelligence.
-                </p>
-              </div>
+          <nav className="flex gap-1 overflow-x-auto px-3 pb-3 md:flex-col md:overflow-visible md:px-3 md:pb-5">
+            {/* Action Required */}
+            {actionItems.length > 0 && (
               <button
                 type="button"
-                onClick={() => setIsDark((prev) => !prev)}
-                className="flex items-center gap-3 rounded-full border border-slate-200 bg-white/70 px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:border-slate-600"
-                aria-pressed={isDark}
+                onClick={() => setView({ kind: "action-required" })}
+                className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-all md:w-full ${
+                  view.kind === "action-required"
+                    ? "bg-rose-50 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300"
+                    : "text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-500/10"
+                }`}
               >
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-white shadow-sm dark:bg-slate-100 dark:text-slate-900">
-                  {isDark ? "\u263E" : "\u2600"}
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white">
+                  {actionItems.length}
                 </span>
-                <span className="text-xs uppercase tracking-[0.2em]">
-                  {isDark ? "Dark" : "Light"} Mode
+                <span className="font-medium">要対応</span>
+              </button>
+            )}
+
+            {/* My Actions */}
+            <button
+              type="button"
+              onClick={() => setView({ kind: "my-actions" })}
+              className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-all md:w-full ${
+                view.kind === "my-actions"
+                  ? "bg-amber-50 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300"
+                  : "text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-500/10"
+              }`}
+            >
+              <span className="font-medium">My Actions</span>
+            </button>
+
+            {/* Saku Report */}
+            <button
+              type="button"
+              onClick={() => setView({ kind: "saku-report" })}
+              className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-all md:w-full ${
+                view.kind === "saku-report"
+                  ? "bg-blue-50 text-blue-700 dark:bg-blue-500/15 dark:text-blue-200"
+                  : "text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-500/10"
+              }`}
+            >
+              <span className="font-medium">さくレポート</span>
+            </button>
+
+            <div className="mx-2 hidden border-t border-slate-100 dark:border-slate-800 md:my-2 md:block" />
+
+            {/* Project List */}
+            {projects.map((p) => (
+              <button
+                key={p.name}
+                type="button"
+                onClick={() => setView({ kind: "project", name: p.name })}
+                className={`flex shrink-0 items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-all md:w-full ${
+                  view.kind === "project" && view.name === p.name
+                    ? "bg-blue-50 text-blue-700 dark:bg-blue-500/15 dark:text-blue-200"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                }`}
+              >
+                <span className="truncate">{p.name}</span>
+                <span className="ml-2 flex items-center gap-1.5">
+                  {p.actionCount > 0 && (
+                    <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
+                  )}
+                  <span className="text-xs text-slate-400 dark:text-slate-500">{p.items.length}</span>
                 </span>
               </button>
-            </header>
+            ))}
+          </nav>
+        </aside>
 
-            <div className="mt-6">
-              <GlobalSearch />
+        {/* Main */}
+        <main className="min-w-0 flex-1 p-6 md:p-10">
+          <header className="mb-8 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm text-slate-400 dark:text-slate-500">
+              <button
+                type="button"
+                onClick={() => setView({ kind: "overview" })}
+                className="hover:text-slate-600 dark:hover:text-slate-300"
+              >
+                Projects
+              </button>
+              {breadcrumb && (
+                <>
+                  <span>/</span>
+                  <span className="text-slate-700 dark:text-slate-200">{breadcrumb}</span>
+                </>
+              )}
             </div>
-          </section>
+            <button
+              type="button"
+              onClick={() => setIsDark((prev) => !prev)}
+              className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-600 transition-all hover:border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+            >
+              {isDark ? "Dark" : "Light"}
+            </button>
+          </header>
 
-          <section id="calendar" className="scroll-mt-24">
-            <WeeklyCalendar />
-          </section>
-
-          <section id="activity" className="scroll-mt-24">
-            <ActivityFeed />
-          </section>
-
-          <section id="shared" className="scroll-mt-24">
-            <div className="grid gap-6 lg:grid-cols-2">
-              <SharedMemo />
-              <SharedTasks />
-            </div>
-          </section>
+          {loading ? (
+            <p className="text-sm text-slate-400">Loading...</p>
+          ) : view.kind === "overview" ? (
+            <ProjectOverview
+              projects={projects}
+              actionItems={actionItems}
+              projectMeta={projectMeta}
+              onSelect={setView}
+            />
+          ) : view.kind === "action-required" ? (
+            <ActionRequiredView items={actionItems} />
+          ) : view.kind === "my-actions" ? (
+            <MyActionsView projectMeta={projectMeta} />
+          ) : view.kind === "saku-report" ? (
+            <SakuReportView />
+          ) : (
+            <ProjectDetail
+              name={view.name}
+              items={projects.find((p) => p.name === view.name)?.items || []}
+              meta={projectMeta[view.name]}
+            />
+          )}
         </main>
       </div>
     </div>

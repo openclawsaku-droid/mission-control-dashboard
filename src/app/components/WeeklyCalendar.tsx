@@ -173,7 +173,7 @@ export default function WeeklyCalendar() {
       map.get(task.date)?.push(task);
     }
     for (const list of map.values()) {
-      list.sort((a, b) => a.time.localeCompare(b.time));
+      list.sort((a, b) => (a.time ?? "").localeCompare(b.time ?? ""));
     }
     return map;
   }, [tasks]);

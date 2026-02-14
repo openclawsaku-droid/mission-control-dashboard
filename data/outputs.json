@@ -1,0 +1,493 @@
+[
+  {
+    "id": "out-de-17710403319221",
+    "title": "mine.de.school設計資料",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/16FkgwVm2zqeYRhSdnG6RmEgyChmGF27bGY0Sb7XZBB0",
+    "summary": "Miroボードを元に再構成した設計ドキュメント。教育哲学、Andy行動ループ(OODA)、学習分析イベント分類、コンテキスト構造など",
+    "tags": [
+      "設計",
+      "Mindcraft",
+      "教育"
+    ],
+    "project": "DEスクール",
+    "status": "final",
+    "createdAt": "2026-02-11T12:00:00.000Z"
+  },
+  {
+    "id": "out-de-17710403319222",
+    "title": "Mindcraft深掘り分析",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/19KGs9tjypCr5wNjaFufcHMKpPcCmK1j1E1P95ARU-UE",
+    "summary": "Mindcraftソースコード直読みの技術分析。メモリ管理、プロンプト構造、イベント処理の詳細と実装タスク10件",
+    "tags": [
+      "技術",
+      "Mindcraft",
+      "分析"
+    ],
+    "project": "DEスクール",
+    "status": "final",
+    "createdAt": "2026-02-12T12:00:00.000Z"
+  },
+  {
+    "id": "out-de-17710403319223",
+    "title": "Miroボード分析サマリー",
+    "type": "memory",
+    "url": "memory/projects/de-school/miro-board-summary.md",
+    "summary": "Miroボード564アイテムの分析。サービス全体像、教育哲学、Andyの設計、学習コンテンツを整理",
+    "tags": [
+      "Miro",
+      "分析"
+    ],
+    "project": "DEスクール",
+    "status": "final",
+    "createdAt": "2026-02-11T10:00:00.000Z"
+  },
+  {
+    "id": "out-de-17710403319224",
+    "title": "コンテキスト管理v2",
+    "type": "memory",
+    "url": "memory/projects/de-school/context-management-best-practices-v2.md",
+    "summary": "Mindcraftのコンテキスト管理ベストプラクティス。トークン制御、メモリバンク設計、圧縮戦略",
+    "tags": [
+      "コンテキスト",
+      "設計"
+    ],
+    "project": "DEスクール",
+    "status": "final",
+    "createdAt": "2026-02-11T14:00:00.000Z"
+  },
+  {
+    "id": "out-1771037907985",
+    "title": "AIC設計v3（白川さんFB反映版）",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/1SeohPGA7pNt1HIGIwWCkBSYwefqFVayAIScdaLGgJV0",
+    "summary": "白川さんからの「言語化して」FBを反映した最新版",
+    "tags": [
+      "育成",
+      "AIC"
+    ],
+    "project": "育成プログラム",
+    "status": "final",
+    "action": "read",
+    "createdAt": "2026-02-14T02:58:27.985Z"
+  },
+  {
+    "id": "out-1771037907974",
+    "title": "さくaaS価格設定",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/1GrywNmN-_XP_me9udSQkV9owkCEGoIl6Q0CnvrhezW0",
+    "summary": "Mac mini 10万+セットアップ20万=30万の価格設定。これでいいか確認したい",
+    "tags": [
+      "さくaaS",
+      "価格"
+    ],
+    "project": "さくaaS",
+    "status": "review",
+    "action": "feedback",
+    "createdAt": "2026-02-14T02:58:27.974Z"
+  },
+  {
+    "id": "out-1771037907963",
+    "title": "X投稿承認キュー（51件pending）",
+    "type": "other",
+    "url": "http://100.80.8.6:8766/queue?status=pending",
+    "summary": "承認待ちのX投稿が51件溜まっています。確認お願いします",
+    "tags": [
+      "X",
+      "承認"
+    ],
+    "project": "X運用",
+    "status": "review",
+    "action": "approve",
+    "createdAt": "2026-02-14T02:58:27.963Z"
+  },
+  {
+    "id": "out-1771037907949",
+    "title": "壁打ちアジェンダ（最終確認）",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/13wk8fVTxBLojDTBNvyhnsewPkt9K1cBnvKhOnozYObk",
+    "summary": "2/17深津さん壁打ちのアジェンダ。最終確認をお願いします",
+    "tags": [
+      "壁打ち"
+    ],
+    "project": "深津壁打ち",
+    "status": "review",
+    "action": "review",
+    "createdAt": "2026-02-14T02:58:27.949Z"
+  },
+  {
+    "id": "out-1771037529113",
+    "title": "さくaaSユースケース記録",
+    "type": "memory",
+    "url": "memory/projects/sakuaas/use-cases.md",
+    "summary": "ぷんつくが使って便利だったユースケースを記録。顧客向け提供用",
+    "tags": [
+      "さくaaS",
+      "ユースケース"
+    ],
+    "project": "さくaaS",
+    "status": "draft",
+    "createdAt": "2026-02-14T02:52:09.113Z"
+  },
+  {
+    "id": "out-1771037529101",
+    "title": "チームマネジメントレポート",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/1u4GjQSXl1x0yLw2RQKdNjRXzAKgadoVsW5DZc6AGfys",
+    "summary": "AIチームマネジメントの調査レポート",
+    "tags": [
+      "調査",
+      "マネジメント"
+    ],
+    "project": "事業計画",
+    "status": "final",
+    "createdAt": "2026-02-14T02:52:09.101Z"
+  },
+  {
+    "id": "out-1771037529092",
+    "title": "Meet Bot設計書v2",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/1HW4k-ew-B2OK7COYKaWeTFvsQNnEiVXa9oNJpFREXTw",
+    "summary": "Google Meet自動参加botの設計書。Phase 1完了",
+    "tags": [
+      "設計",
+      "bot"
+    ],
+    "project": "saku-meet-bot",
+    "status": "final",
+    "createdAt": "2026-02-14T02:52:09.092Z"
+  },
+  {
+    "id": "out-1771037529081",
+    "title": "Cursor講座スライド",
+    "type": "slide",
+    "url": "https://docs.google.com/presentation/d/1kNGR67XEDKLVx_oE13yiYsm1FJ9BRffkt6wRGwQOs-I",
+    "summary": "Cursor IDE講座用スライド",
+    "tags": [
+      "講座",
+      "Cursor"
+    ],
+    "project": "AITech",
+    "status": "final",
+    "createdAt": "2026-02-14T02:52:09.081Z"
+  },
+  {
+    "id": "out-1771037529072",
+    "title": "Claude Code導入ガイド",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/1lvKXcZEuNxWZ1C_HewG9pNPhv2MAfHH16Gn4AiYoQBM",
+    "summary": "Claude Codeの導入・活用ガイド",
+    "tags": [
+      "ガイド",
+      "Claude"
+    ],
+    "project": "AITech",
+    "status": "final",
+    "createdAt": "2026-02-14T02:52:09.072Z"
+  },
+  {
+    "id": "out-1771037529061",
+    "title": "X競合分析",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/1Ku3VQrnCKncRITMn-KHoQ4QdOTgXGycCPRooT2uXykg",
+    "summary": "AI系Xアカウントの競合分析・ベンチマーク",
+    "tags": [
+      "X",
+      "競合"
+    ],
+    "project": "X運用",
+    "status": "final",
+    "createdAt": "2026-02-14T02:52:09.061Z"
+  },
+  {
+    "id": "out-1771037529050",
+    "title": "X投稿分析レポート",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/16U7Sm1uI6d6zoRVgfOduXlGWEdsHObv5bj6ahrma0eU",
+    "summary": "X投稿のエンゲージメント分析。引用RT=6.9倍の効果",
+    "tags": [
+      "X",
+      "分析"
+    ],
+    "project": "X運用",
+    "status": "final",
+    "createdAt": "2026-02-14T02:52:09.050Z"
+  },
+  {
+    "id": "out-1771037529038",
+    "title": "育成プログラムOverview",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/1yUvQEcA7rGRN-rX9wpGS2QGvMZy0aMrMhHDmy0OqH5s",
+    "summary": "若手AI育成プログラムの全体概要。Mac mini貸出+メンタリング",
+    "tags": [
+      "育成"
+    ],
+    "project": "育成プログラム",
+    "status": "final",
+    "createdAt": "2026-02-14T02:52:09.038Z"
+  },
+  {
+    "id": "out-1771037529027",
+    "title": "AIC設計v3",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/1SeohPGA7pNt1HIGIwWCkBSYwefqFVayAIScdaLGgJV0",
+    "summary": "AI Creators育成プログラム設計v3。株式型、ガイドライン削除済み",
+    "tags": [
+      "育成",
+      "設計"
+    ],
+    "project": "育成プログラム",
+    "status": "final",
+    "createdAt": "2026-02-14T02:52:09.027Z"
+  },
+  {
+    "id": "out-1771037529013",
+    "title": "OpenClaw脅威分析",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/1oQUPincyPSjXXbmSZDqokAe-81ppl7mS_AZu-oYUqpM",
+    "summary": "OpenClawに対する脅威モデリングと対策",
+    "tags": [
+      "セキュリティ",
+      "分析"
+    ],
+    "project": "インフラ・ツール",
+    "status": "final",
+    "createdAt": "2026-02-14T02:52:09.013Z"
+  },
+  {
+    "id": "out-1771037528999",
+    "title": "セキュリティ統合レポート",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/1tgd_D0xRxdrX1lNx2Ton1niGeFjok0XUJi3a_BWFelY",
+    "summary": "OpenClaw環境のセキュリティ統合評価。exec-approvals・Funnel停止等の対策込み",
+    "tags": [
+      "セキュリティ"
+    ],
+    "project": "インフラ・ツール",
+    "status": "final",
+    "createdAt": "2026-02-14T02:52:08.999Z"
+  },
+  {
+    "id": "out-1771037528986",
+    "title": "Lindy AI深掘り",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/1NFoYxsD8WNmae5bcvMWRCqM0Gc6c6gcg52GJEzflY_0",
+    "summary": "Lindy AIの製品・ビジネスモデル・技術スタックの詳細分析",
+    "tags": [
+      "競合",
+      "深掘り"
+    ],
+    "project": "事業計画",
+    "status": "final",
+    "createdAt": "2026-02-14T02:52:08.986Z"
+  },
+  {
+    "id": "out-1771037528967",
+    "title": "日本競合マップ",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/1w1WbAfB3pFnr2oWXucwpHRCJN-0TPKLSj5lKkVFk6w4",
+    "summary": "日本のAIエージェント市場の競合マッピング",
+    "tags": [
+      "競合",
+      "市場"
+    ],
+    "project": "事業計画",
+    "status": "final",
+    "createdAt": "2026-02-14T02:52:08.967Z"
+  },
+  {
+    "id": "out-1771037528955",
+    "title": "ブルーオーシャン分析",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/1Ix8oyySZMuS64ubmdmstxN6i_Zb_f4PHm2ANO8eI6b0",
+    "summary": "日本版Lindy AIが最有力。競合の少ない市場セグメント分析",
+    "tags": [
+      "分析",
+      "市場"
+    ],
+    "project": "事業計画",
+    "status": "final",
+    "createdAt": "2026-02-14T02:52:08.955Z"
+  },
+  {
+    "id": "out-1771037528943",
+    "title": "1222社スタートアップリスト",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/1yWvRV3_d3wNmUHnyitD7ASQBE6-qs66z8hVnjfvFttc",
+    "summary": "AIエージェント系スタートアップ1,222社の一覧データ",
+    "tags": [
+      "調査",
+      "データ"
+    ],
+    "project": "事業計画",
+    "status": "final",
+    "createdAt": "2026-02-14T02:52:08.943Z"
+  },
+  {
+    "id": "out-1771037528929",
+    "title": "ビジネスプラン5案",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/15Z0zqpm1hU5FPWu47C8nm9Xqc4EGDc6xEnSwhJPOkBE",
+    "summary": "ミチシル・AI寺子屋・ナラティブ・さくOS・ポストパイロットの5案比較",
+    "tags": [
+      "ビジネス",
+      "企画"
+    ],
+    "project": "事業計画",
+    "status": "final",
+    "createdAt": "2026-02-14T02:52:08.929Z"
+  },
+  {
+    "id": "out-1771037528917",
+    "title": "実現性分析",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/1rjhe6OVDE1R4QIUI0rSiCI40ROzw2jUgU3c0mj7LGS8",
+    "summary": "さくaaSのビジネス実現性分析。コスト構造・収益モデル・リスク",
+    "tags": [
+      "分析"
+    ],
+    "project": "さくaaS",
+    "status": "final",
+    "createdAt": "2026-02-14T02:52:08.917Z"
+  },
+  {
+    "id": "out-1771037528906",
+    "title": "セキュリティガイドライン",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/1H1LJNNEf9YGDxxDSnB0aFqEzQGNKnnR67A4wCCcd1G8",
+    "summary": "顧客向けセキュリティガイドライン。運用ルール・アクセス制御",
+    "tags": [
+      "セキュリティ",
+      "GL"
+    ],
+    "project": "さくaaS",
+    "status": "final",
+    "createdAt": "2026-02-14T02:52:08.906Z"
+  },
+  {
+    "id": "out-1771037528889",
+    "title": "セキュリティ調査",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/1xd8Tu9RdlNEiwyle3pC6qGo8rBVGp9KzOuxHGVlKfy8",
+    "summary": "さくaaS向けセキュリティ要件の調査・整理",
+    "tags": [
+      "セキュリティ"
+    ],
+    "project": "さくaaS",
+    "status": "final",
+    "createdAt": "2026-02-14T02:52:08.889Z"
+  },
+  {
+    "id": "out-1771037528874",
+    "title": "コード監査レポート",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/1PcperO8hnfpuQqc1I8HrvEagZg-IwG9Cqb__LAYDG_M",
+    "summary": "OpenClawコードベースの監査。セキュリティ・品質・依存関係の分析",
+    "tags": [
+      "セキュリティ",
+      "監査"
+    ],
+    "project": "さくaaS",
+    "status": "final",
+    "createdAt": "2026-02-14T02:52:08.874Z"
+  },
+  {
+    "id": "out-1771037528857",
+    "title": "さくaaS v2提案書",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/1GrywNmN-_XP_me9udSQkV9owkCEGoIl6Q0CnvrhezW0",
+    "summary": "さくaaS詳細提案書v2。RMMモデル、Langfuse監視、メタエージェント自動改善",
+    "tags": [
+      "壁打ち",
+      "さくaaS"
+    ],
+    "project": "深津壁打ち",
+    "status": "final",
+    "createdAt": "2026-02-14T02:52:08.857Z"
+  },
+  {
+    "id": "out-1771037528843",
+    "title": "深津さん調査",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/1f_k9xVaPyg5pNqP2CCOIhabp0RL6fFz83lrSXVO_DjA",
+    "summary": "深津貴之さんの経歴・活動・note CXOとしての取り組みを調査",
+    "tags": [
+      "壁打ち",
+      "調査"
+    ],
+    "project": "深津壁打ち",
+    "status": "final",
+    "createdAt": "2026-02-14T02:52:08.843Z"
+  },
+  {
+    "id": "out-1771037528830",
+    "title": "1枚サマリー",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/1DasHgFV1tIP2yW-7q_2209EuAnNpKQktGJekPWu89Cc",
+    "summary": "深津壁打ち用1枚サマリー。さくaaSの概要を簡潔に",
+    "tags": [
+      "壁打ち",
+      "サマリー"
+    ],
+    "project": "深津壁打ち",
+    "status": "final",
+    "createdAt": "2026-02-14T02:52:08.830Z"
+  },
+  {
+    "id": "out-1771037528819",
+    "title": "壁打ちアジェンダ",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/13wk8fVTxBLojDTBNvyhnsewPkt9K1cBnvKhOnozYObk",
+    "summary": "深津さん壁打ち(2/17)のアジェンダ。さくaaS中心のピッチ構成",
+    "tags": [
+      "壁打ち"
+    ],
+    "project": "深津壁打ち",
+    "status": "final",
+    "createdAt": "2026-02-14T02:52:08.819Z"
+  },
+  {
+    "id": "out-1771035507817",
+    "title": "成果物ビュー設計書",
+    "type": "memory",
+    "url": "memory/projects/mission-control/output-view-design.md",
+    "summary": "Mission Control Dashboardに成果物ビューを追加する設計書。データスキーマ、API、UI、リスク洗い出し",
+    "tags": [
+      "設計",
+      "Dashboard"
+    ],
+    "project": "インフラ・ツール",
+    "status": "final",
+    "createdAt": "2026-02-14T02:18:27.817Z"
+  },
+  {
+    "id": "out-1771035507805",
+    "title": "スタートアップ1222社調査レポート",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/1xI18mJE5uUFWqCM8NVy6i7Rg-Q11H1tcpbogoOagOoA",
+    "summary": "AIエージェント系スタートアップ1,222社を調査。日本版Lindy AIが最有力候補",
+    "tags": [
+      "ビジネス",
+      "調査"
+    ],
+    "project": "事業計画",
+    "status": "final",
+    "createdAt": "2026-02-14T02:18:27.805Z"
+  },
+  {
+    "id": "out-1771035507791",
+    "title": "AITech MTGガイド v2",
+    "type": "google-docs",
+    "url": "https://docs.google.com/document/d/1S5jxbFKmt4p1Me1rhkHk-ILCKXlbuVBEJhlATMmvPrw",
+    "summary": "深津さん壁打ち用の論点整理。GPT-5.2の理論物理成果とOpenAIミッション変遷を軸に構成",
+    "tags": [
+      "AITech",
+      "壁打ち"
+    ],
+    "project": "AITech",
+    "status": "final",
+    "linearIssueId": "SAK-91",
+    "createdAt": "2026-02-14T02:18:27.791Z"
+  }
+]

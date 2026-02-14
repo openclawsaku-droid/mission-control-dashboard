@@ -1,0 +1,13 @@
+{
+  "date": "2026-02-13（木）",
+  "entries": [
+    { "time": "全日", "content": "セキュリティ硬化: exec-approvals導入、Funnel停止", "project": "インフラ・ツール" },
+    { "time": "全日", "content": "AIC v3設計完了（白川さんFB反映）", "project": "育成プログラム" },
+    { "time": "全日", "content": "saku-meet-bot Phase 1完了", "project": "saku-meet-bot" },
+    { "time": "全日", "content": "X投稿分析完了（引用RT=6.9倍の効果を発見）", "project": "X運用" },
+    { "time": "全日", "content": "チームマネジメント調査レポート完成", "project": "事業計画" },
+    { "time": "全日", "content": "さくaaSスケール戦略策定（RMMモデル、Langfuse監視）", "project": "さくaaS" },
+    { "time": "全日", "content": "さくaaS価格設計確定（導入30万、ライト月10万、プレミアム月40万）", "project": "さくaaS" },
+    { "time": "全日", "content": "GPT-5.3 + Gemini 3 + Anthropic $30B市場動向キャッチアップ", "project": "事業計画" }
+  ]
+}

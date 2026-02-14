@@ -1,0 +1,106 @@
+[
+  {
+    "id": "task-001",
+    "title": "GitHub CLI ログイン設定",
+    "date": "2026-02-10",
+    "status": "done",
+    "priority": "medium",
+    "description": "gh auth login でGitHub認証を設定"
+  },
+  {
+    "id": "task-002",
+    "title": "Vercel CLI ログイン設定",
+    "date": "2026-02-10",
+    "status": "done",
+    "priority": "medium",
+    "description": "vercel login でVercel認証を設定"
+  },
+  {
+    "id": "task-003",
+    "title": "Activity自動記録システム構築",
+    "date": "2026-02-10",
+    "status": "done",
+    "priority": "high",
+    "description": "auto-record-activity.js 構築済み"
+  },
+  {
+    "id": "task-004",
+    "title": "ダッシュボードUI改善",
+    "date": "2026-02-11",
+    "status": "todo",
+    "priority": "low",
+    "description": "フィードバックに基づいてUIを調整"
+  },
+  {
+    "id": "task-005",
+    "title": "X API導入 + 承認フロー実装",
+    "date": "2026-02-11",
+    "status": "todo",
+    "priority": "high",
+    "description": "Developer Console登録→API実装→Discord承認フロー。15時リマインド設定済み"
+  },
+  {
+    "id": "task-006",
+    "title": "Brave Search APIキー設定",
+    "date": "2026-02-11",
+    "status": "cancelled",
+    "priority": "medium",
+    "description": "不要。OpenClaw内蔵のweb_searchで十分"
+  },
+  {
+    "id": "task-007",
+    "title": "gog CLI Google API有効化",
+    "date": "2026-02-11",
+    "status": "done",
+    "priority": "medium",
+    "description": "gcloud CLIインストール→認証→Gmail/Calendar API有効化完了"
+  },
+  {
+    "id": "task-008",
+    "title": "深津さん壁打ち準備",
+    "date": "2026-02-11",
+    "status": "todo",
+    "priority": "high",
+    "description": "AIサービスアイデア整理、壁打ちで聞くこと・見せるものを準備"
+  },
+  {
+    "id": "task-009",
+    "title": "X投稿テンプレート・スケジュール設計",
+    "date": "2026-02-11",
+    "status": "todo",
+    "priority": "medium",
+    "description": "投稿パターン、最適時間帯、テーマローテーションを設計"
+  },
+  {
+    "id": "task-010",
+    "title": "Xフォロワー分析",
+    "date": "2026-02-11",
+    "status": "todo",
+    "priority": "medium",
+    "description": "どの層が反応してるか、伸びたツイートの傾向分析"
+  },
+  {
+    "id": "task-011",
+    "title": "検証型アプローチ：反応テーマ分析",
+    "date": "2026-02-11",
+    "status": "todo",
+    "priority": "high",
+    "description": "Xで反応良かったテーマを特定→サービスアイデアに繋げる"
+  },
+  {
+    "id": "task-012",
+    "title": "読書習慣サポート実装",
+    "date": "2026-02-11",
+    "status": "in_progress",
+    "priority": "low",
+    "description": "設計書・reading-log.json作成済み。次: Heartbeatに読書チェック追加、最初の1冊登録、さくの声かけ機能"
+  },
+  {
+    "id": "task-013",
+    "title": "Mission Control Dashboard改善",
+    "date": "2026-02-11",
+    "status": "todo",
+    "priority": "medium",
+    "description": "タスク管理画面の強化、カレンダー連携、検索改善"
+  }
+]
