@@ -18,6 +18,8 @@ type OutputItem = {
 type NextAction = {
   owner: string;
   task: string;
+  how?: string;
+  link?: string;
 };
 
 type ProjectProgress = {
@@ -330,17 +332,34 @@ function ProjectDetail({
             Next Actions
           </h3>
           {meta?.nextActions && meta.nextActions.length > 0 ? (
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {meta.nextActions.map((action, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm">
-                  <span className={`mt-0.5 shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold ${
-                    action.owner === "ぷんつく"
-                      ? "bg-amber-200 text-amber-800 dark:bg-amber-500/20 dark:text-amber-200"
-                      : "bg-blue-200 text-blue-800 dark:bg-blue-500/20 dark:text-blue-200"
-                  }`}>
-                    {action.owner}
-                  </span>
-                  <span className="text-amber-800 dark:text-amber-200">{action.task}</span>
+                <li key={i} className="text-sm">
+                  <div className="flex items-start gap-2">
+                    <span className={`mt-0.5 shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold ${
+                      action.owner === "ぷんつく"
+                        ? "bg-amber-200 text-amber-800 dark:bg-amber-500/20 dark:text-amber-200"
+                        : "bg-blue-200 text-blue-800 dark:bg-blue-500/20 dark:text-blue-200"
+                    }`}>
+                      {action.owner}
+                    </span>
+                    <span className="font-medium text-amber-800 dark:text-amber-200">{action.task}</span>
+                  </div>
+                  {action.how && (
+                    <p className="mt-1 ml-[calc(theme(spacing.2)+3rem)] text-xs leading-relaxed text-amber-700/70 dark:text-amber-300/60">
+                      {action.how}
+                    </p>
+                  )}
+                  {action.link && (
+                    <a
+                      href={action.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-1 ml-[calc(theme(spacing.2)+3rem)] inline-block text-xs font-medium text-amber-600 underline decoration-amber-300 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-200"
+                    >
+                      開く →
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
@@ -388,7 +407,7 @@ function MyActionsView({
   const allActions = Object.entries(projectMeta).flatMap(([project, meta]) =>
     (meta.nextActions || [])
       .filter((a) => a.owner === "ぷんつく")
-      .map((a) => ({ ...a, project, emoji: meta.emoji ? EMOJI_MAP[meta.emoji] || "" : "" }))
+      .map((a) => ({ ...a, project, emoji: meta.emoji ? EMOJI_MAP[meta.emoji] || "" : "", how: a.how, link: a.link }))
   );
 
   return (
@@ -403,13 +422,30 @@ function MyActionsView({
         {allActions.map((action, i) => (
           <div
             key={i}
-            className="flex items-start gap-4 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
+            className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
           >
-            <span className="mt-0.5 shrink-0 text-lg">{action.emoji}</span>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{action.task}</p>
-              <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">{action.project}</p>
+            <div className="flex items-start gap-4">
+              <span className="mt-0.5 shrink-0 text-lg">{action.emoji}</span>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{action.task}</p>
+                <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">{action.project}</p>
+              </div>
             </div>
+            {action.how && (
+              <p className="mt-2 ml-10 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                {action.how}
+              </p>
+            )}
+            {action.link && (
+              <a
+                href={action.link}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-1.5 ml-10 inline-block rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition-all hover:bg-blue-100 dark:bg-blue-500/10 dark:text-blue-300 dark:hover:bg-blue-500/20"
+              >
+                開く →
+              </a>
+            )}
           </div>
         ))}
         {allActions.length === 0 && (
